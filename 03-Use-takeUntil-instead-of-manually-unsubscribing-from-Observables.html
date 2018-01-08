@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+<body>
+  <div id="foo"></div>
+	<script src="https://unpkg.com/rxjs@5.4.3/bundles/Rx.min.js"></script>
+	<script>
+    // const click$ = Rx.Observable
+    //     .fromEvent(document, 'click');
+    
+    // /*
+    // click$          --c------c---c-c-----c---c---c-
+    // sixClicks$      --c------c---c-c-----c---c|
+    // */
+    
+    // const sixClicks$ = click$.take(6);
+    
+    // sixClicks$.subscribe(function (ev) {
+    //     console.log(ev.clientX)
+    // });
+    
+
+    const click$ = Rx.Observable
+        .fromEvent(document, 'click');
+    
+    const four$ = Rx.Observable.interval(4000).take(1);
+    
+    /*
+    click$          --c------c---c-c-----c---c---c-
+    four$           -----------------0|
+    clickUntilFour$ --c------c---c-c-|
+    */
+    
+    const clickUntilFour$ = click$.takeUntil(four$);
+    
+    clickUntilFour$.subscribe(function (ev) {
+        console.log(ev.clientX)
+    });
+    
+    </script>
+</body>
+</html>
