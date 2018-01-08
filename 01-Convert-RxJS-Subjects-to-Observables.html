@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+<body>
+  <div id="foo"></div>
+	<script src="https://unpkg.com/rxjs@5.4.3/bundles/Rx.min.js"></script>
+	<script>
+
+    // why not a good idea to use subject here:
+    // 1. the click stream is exposed here
+    // for any other script in the page to send events into it
+    // 2. the event listener here is not being disposed
+
+    // const click$ = new Rx.Subject();
+    // document.addEventListener('click', function (ev) {
+    //     click$.next(ev);
+    // });
+
+    // click$.subscribe(function (ev) {
+    //     console.log(ev);
+    // })
+
+    const click$ = Rx.Observable.create(
+        function subscribe(observer) {
+            const listener = function (ev){
+                observer.next(ev);
+            };
+
+            document.addEventListener('click', listener);
+
+            return function unsubscribe() {
+                document.removeEventListener('click', listener)
+            };
+        }
+    )
+
+    const subscription = click$.subscribe(function (ev) {
+        console.log(ev.clientX)
+    })
+
+    setTimeout(function () {
+        subscription.unsubscribe();
+    }, 4000);
+
+    </script>
+</body>
+</html>
