@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+<body>
+  <div id="foo"></div>
+	<script src="https://unpkg.com/rxjs@5.4.3/bundles/Rx.min.js"></script>
+	<script>
+    // THIS IS WHAT'S BEING REPLACED: 
+    //     const click$ = Rx.Observable.create(
+    //         function subscribe(observer) {
+    //             const listener = function (ev){
+    //                 try { observer.next(ev) }
+    //                 catch (err) {observer.error(err)}
+    //         };
+
+    //         document.addEventListener('click', listener);
+
+    //         return function unsubscribe() {
+    //             document.removeEventListener('click', listener)
+    //         };
+    //     }
+    // )
+        const click$ = Rx.Observable
+            .fromEvent(document, 'click');
+
+        const subscription = click$.subscribe(function (ev) {
+            console.log(ev.clientX)
+        });
+
+        setTimeout(function () {
+            subscription.unsubscribe();
+        }, 4000);
+    </script>
+</body>
+</html>
