@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+<body>
+  <div id="foo"></div>
+	<script src="https://unpkg.com/rxjs@5.4.3/bundles/Rx.min.js"></script>
+	<script>
+        // const x$ = new Rx.Subject();
+
+        const click$ = Rx.Observable
+        .fromEvent(document, 'click');
+
+        const x$ = click$.map(ev => ev.clientX);
+
+        // below's a next method inside of a next callback
+        // signalling there's sth wrong with the code
+
+        // click$.subscribe({
+        //   next: function (ev) {
+        //     x$.next(ev.clientX);
+        //   }
+        // });
+
+        x$.subscribe({
+        next: function next(x) {
+            console.log(x);
+        }
+        });
+    </script>
+</body>
+</html>
