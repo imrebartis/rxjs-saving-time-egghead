@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+<body>
+  <div id="foo"></div>
+	<script src="https://unpkg.com/rxjs@5.4.3/bundles/Rx.min.js"></script>
+	<script>
+        const userData$ = Rx.Observable.ajax({
+            url: 'https://jsonplaceholder.typicode.com/users/2',
+            method: 'GET',
+        });
+            
+        const click$ = Rx.Observable
+            .fromEvent(document, 'click');
+        // AVOIDING THE CALLBACK HELL BELOW
+        // click$.subscribe({
+        //     next: function (ev) {
+        //         userData$.subscribe({
+        //             next: function (data) {
+        //                 console.log(data.response);
+        //             }
+        //         });
+        //     }
+        // });
+
+        const resWhenClick$ = click$
+            .mergeMap(ev => userData$);
+
+        // longer version:
+        // const resWhenClick$ = click$
+        //     .map(ev => userData$)
+        //     .mergeAll();
+
+        resWhenClick$.subscribe({
+            next: function (userData$) {
+                console.log(userData$.response)
+            }
+        });
+    </script>
+</body>
+</html>
