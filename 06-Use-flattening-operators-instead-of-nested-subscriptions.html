@@ -26,8 +26,11 @@
         //     }
         // });
 
+        // mergeMap would do the trick as well
+        // but switchMap makes sure that
+        // when u doubleclick you'll get only one observable
         const resWhenClick$ = click$
-            .mergeMap(ev => userData$);
+            .switchMap(ev => userData$);
 
         // longer version:
         // const resWhenClick$ = click$
