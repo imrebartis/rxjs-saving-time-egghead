@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+<body>
+  <div id="foo"></div>
+	<script src="https://unpkg.com/rxjs@5.4.3/bundles/Rx.min.js"></script>
+	<script>
+        const length$ = Rx.Observable.of(5);
+        const width$ = Rx.Observable.of(7);
+        const height$ = Rx.Observable.of(2.8, 3.8);
+
+        // .zip shows only the old volume (98)
+        // cause it works in a synchronized manner
+        // i.e. you'd have to add (5, 5) and (7, 7)
+        // in order to show both the old and the new volume (133)
+
+        // const volume$ = Rx.Observable
+        // .zip(length$, width$, height$,
+        //     (length, width, height) => length * width * height
+        // );
+
+         // .combineLatest shows both the old volume and the updated one (133)
+        const volume$ = Rx.Observable
+        .combineLatest(length$, width$, height$,
+            (length, width, height) => length * width * height
+        );
+
+        volume$.subscribe(function (volume) {
+        console.log(volume)
+        });
+    </script>
+</body>
+</html>
