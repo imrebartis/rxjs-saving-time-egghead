@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+<body>
+  <div></div>
+	<script src="https://unpkg.com/rxjs@5.4.3/bundles/Rx.min.js"></script>
+	<script>
+
+        // class MyAgeObservable extends Rx.Observable {
+        //   constructor(initialAge) {
+        //     super((observer) => {
+        //       observer.next(initialAge)
+        //     });
+        //     this.age = initialAge
+        //   }
+        //   setAge(age) {
+        //     this.age = age
+        //   }
+        // }
+
+        // const a$ = new MyAgeObservable(0);
+        // a$.subscribe(x => console.log('My age is ' + x));
+        // a$.setAge(21); // => 'My age is 0'
+
+        class LogSubscriber extends Rx.Subscriber {
+          next(value) {
+            console.log('next ' + value);
+            this._next(value);
+          }
+          
+          error(e) {
+            console.log('error ' + e);
+            this._error(e);
+          }
+          
+          complete() {
+            console.log('complete');
+            this._complete();
+          }
+        }
+
+        class LogOperator {
+          constructor(childOperator) {
+            this.childOperator = childOperator;
+          }
+
+          call(subscriber, source) {
+            return this.childOperator.call(
+              new LogSubscriber(subscriber), source
+            );
+          }
+        }
+
+        class LogObservable extends Rx.Observable {
+          lift(operator) {
+            const observable = new LogObservable();
+            observable.source = this;
+            observable.operator = new LogOperator(operator);
+            return observable;
+          }
+        }
+
+        // --1--2--3|
+        // const observable = Rx.Observable.interval(100)
+        //   .map(x => x+1)
+        //   .take(3);
+
+        const observable = new LogObservable((observer) => {
+          setTimeout(() => {observer.next(1)}, 100);
+          setTimeout(() => {observer.next(2)}, 200);
+          setTimeout(() => {observer.next(3)}, 300);
+          setTimeout(() => {observer.complete()}, 400);
+        });
+
+        observable
+          .map(x => 10 * x) // LogObservable
+          .filter(x => x > 15) // LogObservable
+          .count() // LogObservable
+          .subscribe(x => { alert(x); });
+
+    </script>
+</body>
+</html>
