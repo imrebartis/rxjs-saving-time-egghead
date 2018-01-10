@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div id="dotElem"></div>
+	<script src="https://unpkg.com/rxjs@5.4.3/bundles/Rx.min.js"></script>
+	<script>
+        function updateDot(x, y) {
+            dotElem.style.left = `${x}px`;
+            dotElem.style.top = `${y}px`;
+        }
+
+     // The do operator allows us to perform a side effect in a specific point
+     // here in the chain of operators:
+
+     // btw the .do(ev => updateDot(ev.clientX, ev.clientY))
+     // could be replaced by:
+     // .map(ev => {
+        // updateDot(ev.clientX, ev.clientY);
+        //         return ev
+        //        })
+
+        // Rx.Observable.fromEvent(document, 'click')
+        //     .do(ev => updateDot(ev.clientX, ev.clientY))
+        //     .switchMap(ev => Rx.Observable.ajax({
+        //         url: 'https://jsonplaceholder.typicode.com/users/1',
+        //         method: 'GET'
+        //     }))
+        //     .subscribe(function (data) {
+        //     console.log(data.response)
+        //     });
+
+        const click$ = Rx.Observable.fromEvent(document, 'click');
+
+        click$
+            .do(ev => console.log(ev.clientX)) // use do() for debugging
+            .subscribe(ev => updateDot(ev.clientX, ev.clientY));
+
+        const res$ = click$
+            .switchMap(ev => Rx.Observable.ajax({
+                url: 'https://jsonplaceholder.typicode.com/users/1',
+                method: 'GET'
+            }));
+
+        res$.subscribe(function (data) {
+            console.log(data.response)
+            });
+
+    </script>
+</body>
+</html>
