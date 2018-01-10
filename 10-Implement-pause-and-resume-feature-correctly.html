@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+<body>
+  <div></div>
+	<script src="https://unpkg.com/rxjs@5.4.3/bundles/Rx.min.js"></script>
+	<script>
+        // const res$ = Rx.Observable.interval(2000)
+        //     .switchMap(ev => Rx.Observable.ajax({
+        //         url: 'https://jsonplaceholder.typicode.com/users/1',
+        //         method: 'GET'
+        //     }));
+        
+        // res$.subscribe(function (data) {
+        //     console.log(data.response)
+        // });
+
+        // this will emit booleans
+        const resume$ = new Rx.Subject();
+        
+        // due to switchMap
+        // the code starting at row 34
+        // will behave as "Rx.Observable.interval(2000)" says if the resume stream is true
+        // and as "Rx.Observable.empty()" if the resume stream is false
+        const res$ = resume$
+            .switchMap(resume =>
+                resume ?
+                Rx.Observable.interval(2000) :
+                Rx.Observable.empty()
+        )
+            .do(x => console.log('request it! ' + x))
+            .switchMap(ev => Rx.Observable.ajax({
+                url: 'https://jsonplaceholder.typicode.com/users/1',
+                method: 'GET'
+        }));
+
+        res$.subscribe(function (data) {
+        console.log(data.response)
+        });
+
+        resume$.next(false); // = paused
+        setTimeout(() => resume$.next(true), 500);
+        setTimeout(() => resume$.next(false), 5000);
+
+        // we cannot actually pause and resume this stream,
+        // so that's why we won't get the number two with the code below,
+        //  instead we just restart the stream
+        setTimeout(() => resume$.next(true), 6000);
+        setTimeout(() => resume$.next(false), 9000); //  =>  request it! 0
+    </script>
+</body>
+</html>
